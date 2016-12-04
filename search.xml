@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+    
+    <entry>
+      <title><![CDATA[远程连接MySQL]]></title>
+      <url>http://blog.trysth.top/2016/11/19/mysql_RC/</url>
+      <content type="html"><![CDATA[ <p>　　远程连接ubuntu服务器上的MySQL数据库。</p>
+
+<a id="more"></a>
+<h2 id="修改远程服务器上的MySQL数据库配置文件"><a href="#修改远程服务器上的MySQL数据库配置文件" class="headerlink" title="修改远程服务器上的MySQL数据库配置文件"></a>修改远程服务器上的MySQL数据库配置文件</h2><hr>
+<ol>
+<li>使用命令<code>vim +/bind-address  /etc/mysql/my.cnf</code>打开配置文件，定位到<code>bind-address = 127.0.0.1</code>；</li>
+<li>注释掉这行，如：<code>#bind-address = 127.0.0.1</code> (或者改为：<code>bind-address = 0.0.0.0</code>),允许任意IP访问；再或者自己指定一个IP，此法比较安全。</li>
+<li>重启 MySQL：<code>sudo service mysql restart</code></li>
+</ol>
+<h2 id="进行用户的授权"><a href="#进行用户的授权" class="headerlink" title="进行用户的授权"></a>进行用户的授权</h2><hr>
+<p>使用命令：            </p>
+<pre><code>grant all privileges on *.* to root@&quot;%&quot; identified by &quot;password&quot; with grant option;           
+
+flush privileges;
+</code></pre><p>PS:  </p>
+<ol>
+<li><code>*.*</code>：第一个<em>代表数据库名；第二个</em>代表表名。这里的意思是所有数据库里的所有表都授权给用户。   </li>
+<li>root：授予root账号。</li>
+<li>“%”：表示授权的用户IP可以指定，这里代表任意的IP地址都能访问MySQL数据库。   </li>
+<li>“password”：分配账号对应的密码，这里密码自己替换成你的mysql root帐号密码。   </li>
+<li>第二行命令是刷新权限信息，也即是让我们所作的设置马上生效。   </li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[在ubuntu系统中通过源码安装nodejs]]></title>
+      <url>http://blog.trysth.top/2016/11/14/linux_node/</url>
+      <content type="html"><![CDATA[<p> </p><p>　　在ubuntu中安装最新版的nodejs。</p><br><a id="more"></a><p></p>
+<h2 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h2><hr>
+<ol>
+<li>下载最新的安装文件<code>node-v6.2.0-linux-x64.tar.gz</code></li>
+<li>用WinSCP将代码包上传到ubuntu服务器用户目录下<code>/home/ubuntu</code></li>
+<li>在<code>/home/ubuntu</code>输入命令，<code>tar -xvf node-v0.10.32-linux-x64.tar.gz</code>进行解压</li>
+<li>编辑文件，在终端中输入<code>vi /etc/profile</code>，在文件末尾添加如下代码：<br> export NODE_HOME=/home/ubuntu/node-v6.2.0-linux-x64<br> export PATH=$PATH:$NODE_HOME/bin<br> export NODE_PATH=$NODE_HOME/lib/node_modules   </li>
+<li>然后在终端中输入，<code>source /etc/profile</code>，让配置文件生效。</li>
+<li>在终端中输入：<code>node -v</code>，查看node.js的版本。如果出现版本号则证明安装成功。</li>
+</ol>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[基于Nodejs的跨域方法]]></title>
+      <url>http://blog.trysth.top/2016/11/07/cross_domain_js/</url>
+      <content type="html"><![CDATA[<p> </p><p>　　跨域一词从字面意思看，就是跨域名，但实际上跨域的范围绝对不止那么狭隘。具体概念如下：只要协议、域名、端口有任何一个不同，都被当作是不同的域。 </p><p><br><a id="more"></a><br> </p><p>　　那我么如何实现跨域传输数据呢？一下就是三种比较简单的跨域方法，后台服务器是NodeJs</p><p></p>
+<h2 id="1-通过修改http请求头实现跨域"><a href="#1-通过修改http请求头实现跨域" class="headerlink" title="1.通过修改http请求头实现跨域"></a>1.通过修改http请求头实现跨域</h2><hr>
+<p> </p><p>　　 通过在被请求服务器中添加<code>Access-Control-Allow-Origin</code>来实现跨域</p><p></p>
+<pre><code>//跨域被请求服务器的后端路由
+router.get(&apos;/code&apos;,function (req, res) {
+  res.header(&quot;Access-Control-Allow-Origin&quot;, &quot;http://www.trysth.top/&quot;);
+  var a = req.query;
+  res.send(&quot;传回的数据&quot;)；
+});
+</code></pre><p> </p><p>　　 在前端页面用Ajax实现跨域请求即可</p><p></p>
+<pre><code>//前端请求页面
+$.ajax({
+  type:&quot;POST&quot;,
+    //url为跨域请求的服务器的地址
+  url: &quot;url/code&quot;,
+  async:false,
+  data:{
+    name: name,
+    psw:psw
+  },
+  success:function(msg){
+    alert(msg);
+  }
+});
+</code></pre><h2 id="2-通过jsonp实现跨域"><a href="#2-通过jsonp实现跨域" class="headerlink" title="2.通过jsonp实现跨域"></a>2.通过jsonp实现跨域</h2><hr>
+<p> </p><p>　　 通过jsonp实现跨域的代码</p><p></p>
+<pre><code>//跨域被请求服务器的后端路由
+router.get(&apos;/code&apos;,function (req, res) {
+  var _callback = req.query.callback;
+  var _data = {
+    email:&apos;example@163.com&apos;,
+    name:&apos;jaxu&apos;
+  };
+  if(_callback){
+    res.type(&apos;text/javascript&apos;);
+    res.send(_callback + &apos;(&apos; + JSON.stringify(_data) + &apos;)&apos;);
+  }else{
+    res.json(_data);
+  }
+});
+
+//前端请求页面
+$.ajax({
+  type:&quot;get&quot;,
+  url: &quot;Http://www.trysth.top/code&quot;,
+  async:false,
+  cache:false,
+  dataType:&quot;jsonp&quot;,
+  jsonp:&quot;callback&quot;,
+  data:{
+    name: name,
+    psw:psw
+  },
+  success:function(jsonp){
+    alert(json.name);
+  },
+  error:function (e) {
+       alert(&apos;error&apos;);
+  }
+});
+</code></pre><h2 id="3-创建XMLHttpRequest实现跨域"><a href="#3-创建XMLHttpRequest实现跨域" class="headerlink" title="3.创建XMLHttpRequest实现跨域"></a>3.创建XMLHttpRequest实现跨域</h2><hr>
+<pre><code>//跨域被请求服务器的后端路由
+router.post(&apos;/code&apos;,function (req,res) {
+  res.setHeader(&apos;Access-Control-Allow-Origin&apos;,&apos;*&apos;);
+  res.send({name:&apos;待传数据&apos;});
+});
+
+//前端请求页面
+var fun = function () {
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function () {
+    console.log(this.responeText);
+  };
+  xhr.open(&apos;post&apos;,&apos;Http://www.trysth.top/code&apos;,true);
+  xhr.send();
+};
+</code></pre>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[将Ubuntu安装到U盘]]></title>
+      <url>http://blog.trysth.top/2016/10/29/install_ubu_U/</url>
+      <content type="html"><![CDATA[<h1 id="将Ubuntu安装到U盘"><a href="#将Ubuntu安装到U盘" class="headerlink" title="将Ubuntu安装到U盘"></a>将Ubuntu安装到U盘</h1><p> </p><p>　　将Ubuntu等linux系统安装到u盘，随身携带，不管走到哪里，随便找台电脑插上就能使用自己的系统和应用程序。</p><br><a id="more"></a><p></p>
+<h2 id="工具-原料"><a href="#工具-原料" class="headerlink" title="工具/原料"></a>工具/原料</h2><ul>
+<li>U盘两个，一个用于制作启动盘（大于2G即可），另一个用于安装系统（大于8G，越大越好）</li>
+<li>电脑</li>
+<li>Ubuntu ISO文件</li>
+</ul>
+<h2 id="方法-步骤"><a href="#方法-步骤" class="headerlink" title="方法/步骤"></a>方法/步骤</h2><ol>
+<li>首先制作启动盘，下载UltraISO，和ubuntu系统镜像文件（网上资源很多）；</li>
+<li>将ubuntu刻录到用作启动盘的2GU盘中（UltraISO使用，同样有很多教程）</li>
+<li>将ubuntu刻录到2G的U盘中，并从U盘启动。</li>
+<li>进入ubuntu安装环境后，选择Try Ubuntu（试用Ubuntu）。</li>
+<li>插入8G的U盘，双击桌面上的“安装”图标。</li>
+<li>选择语言，选择区域和城市。</li>
+<li>安装类型选择 “其他选项”。</li>
+<li>选择自己的U盘。这里的“<code>/dev/sdc</code>”就是我的U盘，“/dev/sda”则是电脑里的硬盘。现在要为U盘分区，为了建立新的分区，这里先点减号，删除原来分区。（注意：要选择你的U盘，不要选错了，可以通过容量判断哪个是U盘，哪个是本地硬盘）   </li>
+<li>然后再点加号，建立一个新的分区，这个分区即为要安装ubuntu系统的分区。分区类型为<strong>主分区</strong>，分区位置为<strong>空间起始位置</strong>，格式设为<strong>EXT3或EXT4</strong>，挂载点为<strong>/</strong>，具体如图：</li>
+<li>同样的方法，建立第二个分区，分区类型为<strong>逻辑分区</strong>，分区位置为<strong>空间起始位置</strong>，格式为<strong>交换空间</strong>。</li>
+<li><strong>安装启动引导的设备</strong>选择你的U盘，即我的就是选择“<code>/dev/sdc</code>”。注意，不要选错，<code>/sdc</code>后不带任何数字。</li>
+<li>然后点击安装即可，经过漫长的等待，当出现安装完成是，选择<strong>现在重启</strong>，拔掉启动U盘，选择U盘启动即可进入你的ubuntu系统。</li>
+</ol>
+<h2 id="注："><a href="#注：" class="headerlink" title="注："></a>注：</h2><ul>
+<li>将系统安装到U盘会有卡顿的现象，毕竟U盘读写速度有点慢。你可以将系统安装到3.0的U盘或者移硬盘。</li>
+<li>安上ubuntu后，你的U盘在windows系统上将不可用，需要你格式化（不要听他的）。但如果你的存储空间够大，你可以分出一部分空间，将其设置为windows与linux都能用的磁盘格式。</li>
+</ul>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[高性能的Javascript]]></title>
+      <url>http://blog.trysth.top/2016/10/23/h_performance_js/</url>
+      <content type="html"><![CDATA[<p>  　　默认情况下，在大部分浏览器中，Javascript代码文件的加载和执行都是以阻塞方式进行的，并且浏览器是以单线程运行Javascript代码和UI更新的，浏览器加载和运行Javascript代码时会暂停页面上的其他响应。<br><a id="more"></a></p>
+<h1 id="１-加快Javascript文件的加载速度"><a href="#１-加快Javascript文件的加载速度" class="headerlink" title="１.加快Javascript文件的加载速度"></a>１.加快Javascript文件的加载速度</h1><hr>
+<p>  　　浏览器不会像下载CSS文件那样并行下载Javascript。默认情况下，浏览器在解析页面时遇到Javascript引用就会停止后续的Html代码解析，直到Javascript加载并运行完毕，而此时，页面一直处于空白状态。<br>  　　尽管新版本浏览器可以并行下载Js代码文件，或者通过在加载Js代码文件时同时下载页面中的资源来提高性能，但是其阻塞的特性并没有改变。<br>  　　从代码文件的角度，加快Js加载速度最有效的办法就是减少初始化加载文件的体积和加载的速度。<br>  　　所以，方法有：      </p>
+<ul>
+<li>压缩和合并代码文件</li>
+<li>延迟加载和执行</li>
+<li>异步加载和执行</li>
+</ul>
+<h1 id="2-良好编码习惯，提高代码运行速度"><a href="#2-良好编码习惯，提高代码运行速度" class="headerlink" title="2.良好编码习惯，提高代码运行速度"></a>2.良好编码习惯，提高代码运行速度</h1><hr>
+<ol>
+<li>少用<code>for-in</code>循环</li>
+<li>慎用<code>eval</code></li>
+<li>正确使用数组，使数组保存类型单一的数据，而在其他情况下使用对象</li>
+<li>正确的内存回收<ul>
+<li>尽量不使用全局变量，因为全局变量在页面的整个生命周期中不会被回收。</li>
+<li>确保解除已经不需要的事件监听，如那些要移除的DOM对象上绑定的事件。</li>
+<li>不要在闭包中返回外部不需要的对象。     </li>
+</ul>
+</li>
+</ol>
+<h1 id="3-使用高性能的变量或属性值读取方式"><a href="#3-使用高性能的变量或属性值读取方式" class="headerlink" title="3.使用高性能的变量或属性值读取方式"></a>3.使用高性能的变量或属性值读取方式</h1><hr>
+<p>  　　作用域就是变量或函数的作用范围，Javascript中最大的作用域是全局作用域。Javascript中不存在块作用域，即一个大括号包含的区域不会成为一个单独的作用域，最小的作用是函数。函数中局部变量的访问最快，因为它是在作用域链的最里层。<br>  　　所以，最佳实践是：尽量减少变量访问时在作用域链上查找的层级，最好时将变量定义为本作用域的局部变量，尽量不要定义全局变量。如果需要频繁的访问一个外作用于的变量，最好是用一个局部变量保存外部变量，把多次的外部作用域变量访问变为一次外部作用域变量的访问。  </p>
+<pre><code>//最佳实践
+function update(){
+    var doc = document;
+    var imgs = doc.getElementsByTagName(&quot;img&quot;);       
+    for(var i=0,len=imgs.length;i&lt;len;i++){
+        imgs[i].title = doc.title + &quot; - image -&quot; +i；
+    }
+}  
+</code></pre><p>  　　</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[字符串移位]]></title>
+      <url>http://blog.trysth.top/2016/10/22/stingTransfer/</url>
+      <content type="html"><![CDATA[<p>给定一个字符串，要求将字符串前面m个字符移到字符串的尾部。<br>例如，将字符串<code>“absdef”</code>的前3个字符移到字符串尾部，得结果<code>“defabc”</code>。<br><a id="more"></a></p>
+<p>法1：长度位n的字符串，移动位，共需要m*n次操作，同时设置一个变量保存第一个字符。所以，时间复杂度位O（mn），空间复杂度为O（l）；</p>
+<pre><code>#include&lt;iostream&gt;
+using namespace std;
+
+void LeftShiftOne(char *s, int n) {
+    //保存左边第一个字符；
+    char t = s[0];
+    for (int i = 1; i &lt; n; i++) {
+        s[i - 1] = s[i];
+    }
+    s[n - 1] = t;
+}
+void LeftRotateString(char *s, int n, int m) {
+    while (m--) {
+        LeftShiftOne(s, n);
+    }
+}
+
+int main() {
+
+    char ch[] = &quot;1234&quot;;
+    LeftRotateString1(ch, strlen(ch), 5);
+    cout &lt;&lt; ch;
+}
+</code></pre><p>法2：”三步反转法”，时间复杂度O（n），空间复杂度O（l）。</p>
+<pre><code>    void ReverseString(char* s, int from, int to) {
+    //将字符串的首尾交换
+    while (from &lt; to) {
+        char t = s[from];
+        s[from++] = s[to];
+        s[to--] = t;
+    }
+}
+void LeftRotateString(char* s, int n, int m) {
+    //若要左移动大于n位，那么与%n是等价的
+    m %= n;
+    /*
+    *1.将字符串分为两部分；
+    *2.分别反转这两部分的字符串；
+    *3.最后，将上述步骤得到的结果整体反转。
+    */
+    ReverseString(s, 0, m - 1);
+    ReverseString(s, m, n - 1);
+    ReverseString(s, 0, n - 1);
+}
+int main() {
+
+    char ch[] = &quot;1234&quot;;
+    LeftRotateString(ch, strlen(ch), 5);
+    cout &lt;&lt; ch;
+}
+</code></pre>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[NexT主题使用]]></title>
+      <url>http://blog.trysth.top/2016/10/22/NextT/</url>
+      <content type="html"><![CDATA[<p>   记录一些blog制作的一些方法，以便日后查看。<br><a id="more"></a></p>
+<h2 id="内置标签"><a href="#内置标签" class="headerlink" title="内置标签"></a>内置标签</h2><h3 id="文本居中的引用"><a href="#文本居中的引用" class="headerlink" title="文本居中的引用"></a>文本居中的引用</h3><h4 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h4><ul>
+<li>HTML方式：使用这种方式时，给<code>img</code>添加属性<code>class=&quot;blockquote-center&quot;</code>即可。</li>
+<li><p>标签方式：使用<code>centerquote</code>或者 简写<code>cq</code>。</p>
+<pre><code>&lt;!-- HTML方式: 直接在 Markdown 文件中编写 HTML 来调用 --&gt;
+&lt;!-- 其中 class=&quot;blockquote-center&quot; 是必须的 --&gt;
+  &lt;blockquote class=&quot;blockquote-center&quot;&gt;blah blah blah&lt;/blockquote&gt;
+
+  &lt;!-- 标签 方式，要求版本在0.4.5或以上 --&gt;
+{% centerquote %}blah blah blah{% endcenterquote %}
+
+  &lt;!-- 标签别名 --&gt;
+{% cq %} blah blah blah {% endcq %}
+</code></pre></li>
+</ul>
+<h3 id="突破容器宽度限制的图片"><a href="#突破容器宽度限制的图片" class="headerlink" title="突破容器宽度限制的图片"></a>突破容器宽度限制的图片</h3><h4 id="使用方式-1"><a href="#使用方式-1" class="headerlink" title="使用方式"></a>使用方式</h4><ul>
+<li>HTML方式：使用这种方式时，为 img 添加属性 class=”full-image”即可。</li>
+<li><p>标签方式：使用 fullimage 或者 简写 fi， 并传递图片地址、 alt 和 title 属性即可。 属性之间以逗号分隔。</p>
+<pre><code>&lt;!-- HTML方式: 直接在 Markdown 文件中编写 HTML 来调用 --&gt;
+&lt;!-- 其中 class=&quot;full-image&quot; 是必须的 --&gt;
+&lt;img src=&quot;/image-url&quot; class=&quot;full-image&quot; /&gt;
+
+    &lt;!-- 标签 方式，要求版本在0.4.5或以上 --&gt;
+{% fullimage /image-url, alt, title %}
+
+&lt;!-- 别名 --&gt;
+{% fi /image-url, alt, title %}
+</code></pre></li>
+</ul>
+<hr>
+<h2 id="增加网站的浏览次数与访客数量统计功能"><a href="#增加网站的浏览次数与访客数量统计功能" class="headerlink" title="增加网站的浏览次数与访客数量统计功能"></a>增加网站的浏览次数与访客数量统计功能</h2><blockquote>
+<p>网站的浏览次数，即pv；网站的访客数为uv。pv的计算方式是，单个用户连续点击n篇文章，记录n次访问量；uv的计算方式是，单个用户连续点击n篇文章，只记录1次访客数。你可以根据需要添加相应的统计功能。</p>
+</blockquote>
+<h3 id="安装busuanzi-js脚本"><a href="#安装busuanzi-js脚本" class="headerlink" title="安装busuanzi.js脚本"></a>安装busuanzi.js脚本</h3><p>如果你使用的是NexT主题（其他主题类似），打开<code>/theme/next/layout/_partial/footer.swig</code>文件，拷贝下面的代码至文件的开头。</p>
+<pre><code>&lt;script async src=&quot;https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js&quot;&gt;
+</code></pre><p></p>
+<h3 id="显示统计标签"><a href="#显示统计标签" class="headerlink" title="显示统计标签"></a>显示统计标签</h3><p>同样编辑<code>/theme/next/layout/_partial/footer.swig</code>文件。</p>
+<p>如果你想要显示<code>pv</code>统计量，复制以下代码至你想要放置的位置，</p>
+<pre><code>&lt;span id=&quot;busuanzi_container_site_pv&quot;&gt;
+本站总访问量&lt;span id=&quot;busuanzi_value_site_pv&quot;&gt;&lt;/span&gt;次
+&lt;/span&gt;
+</code></pre><p>如果你想要显示<code>uv</code>统计量，复制以下代码至你想要放置的位置，</p>
+<pre><code>&lt;span id=&quot;busuanzi_container_site_uv&quot;&gt;
+  本站访客数&lt;span id=&quot;busuanzi_value_site_uv&quot;&gt;&lt;/span&gt;人次
+&lt;/span&gt;
+</code></pre><hr>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[程序员眼中的单词]]></title>
+      <url>http://blog.trysth.top/2016/10/21/world/</url>
+      <content type="html"><![CDATA[<p> </p><p>　　英语中一个单词可能有很多不同的意思。很多中国开发者外语本来就不好，概念是往往先入为主。甚至在不清楚一般意义的情况下，先记住了特定环境中的意思。</p><br><a id="more"></a><p></p>
+<div class="rich_media_content " id="js_content"><br>                       <p style="TEXT-ALIGN: center"><br></p><table class="" align="center"><tbody><tr><td width="172"><strong>单词</strong></td><td width="125"><strong>非程序员眼中</strong></td><td style="word-break: break-all;" width="179"><strong>程序员眼中</strong></td></tr><tr><td width="171">socket</td><td width="123">插座</td><td width="179">套接字</td></tr><tr><td width="170">performance</td><td width="123">演出</td><td width="179">性能</td></tr><tr><td width="171">ATM</td><td width="123">自动取款机</td><td width="179">异步传输模式</td></tr><tr><td width="171">memory</td><td width="123">记忆</td><td width="179">内存</td></tr><tr><td width="171">eclipse</td><td width="123">日蚀</td><td width="179">一种 IDE</td></tr><tr><td width="171">oracle</td><td width="123">神谕</td><td width="179">甲骨文公司</td></tr><tr><td width="171">cookie</td><td width="123">小甜点</td><td width="179">一种 web session 机制</td></tr><tr><td width="171">stack</td><td width="123">堆</td><td width="179">堆栈</td></tr><tr><td width="171">port</td><td width="123">港口</td><td width="179">端口</td></tr><tr><td width="171">cardboard</td><td width="123">纸盒</td><td width="179">Google 出的 VR 设备</td></tr><tr><td width="171">container</td><td width="123">集装箱</td><td width="179">容器</td></tr><tr><td width="171">terminal</td><td width="123">航站楼</td><td width="179">终端</td></tr><tr><td width="171">python</td><td width="123">蟒蛇</td><td width="179">python编程语言</td></tr><tr><td width="171">jetty</td><td width="123">码头</td><td width="179">一种 servlet 引擎</td></tr><tr><td width="171">tomcat</td><td width="123">雄性的猫</td><td width="179">一种 servlet 引擎</td></tr><tr><td width="171">backbone</td><td width="123">脊柱</td><td width="179">一种前端 MVC 框架</td></tr><tr><td width="171">bug</td><td width="123">虫子</td><td width="179">程序问题</td></tr><tr><td width="171">apache</td><td width="123">阿帕奇直升机</td><td width="179">一种Web服务器</td></tr><tr><td width="171">cache</td><td width="123">隐藏处所</td><td width="179">缓存</td></tr><tr><td width="171">ruby</td><td width="123">红宝石</td><td width="179">ruby编程语言</td></tr><tr><td width="171">java</td><td width="123">爪哇(地点)、爪哇咖啡</td><td width="179">java编程语言</td></tr><tr><td width="171">process</td><td width="123">处理、过程</td><td width="179">计算机进程</td></tr><tr><td width="171">route</td><td width="123">路线、通道</td><td width="179">路由</td></tr><tr><td width="171">site</td><td width="123">位置、地点</td><td width="179">网站</td></tr><tr><td width="171">dump</td><td width="123">倾倒</td><td width="179">转储</td></tr><tr><td width="171">thread</td><td width="123">线、思路</td><td width="179">计算机线程</td></tr><tr><td width="171">crash</td><td width="123">撞碎、坠毁</td><td width="179">程序崩溃</td></tr><tr><td width="171">firewall</td><td width="123">防火墙(实体)</td><td width="179">网络防火墙</td></tr><tr><td width="171">host</td><td width="123">主人</td><td width="179">安装虚拟机程序的主机</td></tr><tr><td width="171">guest</td><td width="123">客人</td><td width="179">host 上的虚拟机</td></tr><tr><td width="171">log</td><td width="123">伐木、记录</td><td width="179">日志</td></tr><tr><td width="171">pipe</td><td width="123">管子</td><td width="179">程序连接的管道</td></tr><tr><td width="171">monitor</td><td width="123">班长、显示器</td><td width="179">监控</td></tr><tr><td width="171">access</td><td width="123">接近; 入口</td><td width="179">存取、访问</td></tr><tr><td width="171">border</td><td width="123">边界</td><td width="179">边框</td></tr><tr><td width="171">client</td><td width="123">客户</td><td width="179">客户端</td></tr><tr><td width="171">server</td><td width="123">侍者</td><td width="179">服务器</td></tr><tr><td width="171">crack</td><td width="123">破裂</td><td width="179">入侵</td></tr><tr><td width="171">domain</td><td width="123">领域</td><td width="179">域名</td></tr><tr><td width="171">FAT</td><td width="123">胖</td><td width="179">一种文件系统</td></tr><tr><td width="171">Trojan</td><td width="123">特洛伊</td><td width="179">木马(计算机病毒)</td></tr><tr><td width="171">shell</td><td width="123">外壳</td><td width="179">命令行交互界面</td></tr><tr><td width="171">postscript</td><td width="123">附言、后记</td><td width="179">一种打印编程语言</td></tr><tr><td width="171">program</td><td width="123">计划、项目</td><td width="179">计算机程序</td></tr><tr><td width="171">clipboard</td><td width="123">带夹子的写字板(实体)</td><td width="179">计算机中的剪切板</td></tr><tr><td width="171">master</td><td width="123">主人、硕士</td><td width="179">主</td></tr><tr><td width="171">slave</td><td width="123">奴隶</td><td width="179">从</td></tr><tr><td width="171">bus</td><td width="123">公共汽车</td><td width="179">总线</td></tr><tr><td width="171">packet</td><td width="123">小包、小盒子</td><td width="179">数据包</td></tr><tr><td width="171">image</td><td width="123">图像、形象</td><td width="179">镜像</td></tr><tr><td width="171">mirror</td><td width="123">镜子</td><td width="179">网站镜像</td></tr><tr><td width="171">array</td><td width="123">排列</td><td width="179">数组</td></tr><tr><td width="171">branch</td><td width="123">分枝</td><td width="179">代码仓库堆分支</td></tr><tr><td width="171">fork</td><td width="123">叉子</td><td width="179">(git)派生项目</td></tr><tr><td width="171">frame</td><td width="123">框架、边框</td><td width="179">帧</td></tr><tr><td width="171">GDG</td><td width="123">郭德纲</td><td width="179">谷歌开发者社区</td></tr><tr><td width="171">polymer</td><td width="123">聚合</td><td width="179">一种 Web 组件库</td></tr><tr><td width="171">dart</td><td width="123">飞镖</td><td width="179">一种编程语言</td></tr><tr><td width="171">flag</td><td width="123">旗帜</td><td width="179">标记</td></tr><tr><td width="171">promise</td><td width="123">承诺</td><td width="179">一种JavaScript 异步编程模型</td></tr><tr><td width="171">commit</td><td width="123">做错事;委托</td><td width="179">提交(代码)</td></tr><tr><td width="171">console</td><td width="123">安慰</td><td width="179">控制台</td></tr><tr><td width="171">landscape</td><td width="123">风景</td><td width="179">横屏</td></tr><tr><td width="171">portrait</td><td width="123">肖像</td><td width="179">竖屏</td></tr><tr><td width="171">spring</td><td width="123">春天、弹簧</td><td width="179">一种 Java IoC 容器</td></tr><tr><td width="171">hibernate</td><td width="123">冬眠</td><td width="179">一种 Java ORM 框架</td></tr><tr><td width="171">core</td><td width="123">核心、果核</td><td width="179">CoreOS</td></tr><tr><td width="171">map</td><td width="123">地图</td><td width="179">映射</td></tr><tr><td width="171">set</td><td width="123">多义</td><td width="179">(数据)集合</td></tr><tr><td width="171">kernel</td><td width="123">核心、要点</td><td width="179">内核</td></tr><tr><td width="171">boot</td><td width="123">靴子</td><td width="179">引导、启动</td></tr><tr><td width="171">boost</td><td width="123">促进、宣扬</td><td width="179">C++ 库</td></tr><tr><td width="171">stub</td><td width="123">字据，存根</td><td width="179">占位</td></tr><tr><td width="171">review</td><td width="123">复习，评测</td><td width="179">(代码)复审</td></tr><tr><td width="171">comment</td><td width="123">评论，意见</td><td width="179">注释</td></tr><tr><td width="171">break point</td><td width="123">拐点、破发点</td><td width="179">断点</td></tr><tr><td width="171">angular</td><td width="123">有角(度)的</td><td width="179">一种 Web MVC 框架</td></tr><tr><td width="171">render</td><td width="123">提出、致使 等多义</td><td width="179">渲染</td></tr><tr><td width="171">Swift</td><td width="123">雨燕、敏捷的</td><td width="179">Swift 编程语言</td></tr></tbody></table><p>　　类似的应该还有不少。这些词对程序员有特定的含义，特别是对我们这些平时只生活在中文环境中的人。欢迎留言补充！</p><br>                    </div>]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[测试]]></title>
+      <url>http://blog.trysth.top/2016/09/25/ceshi/</url>
+      <content type="html"></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[长清大学城一日游]]></title>
+      <url>http://blog.trysth.top/2016/09/24/jy/</url>
+      <content type="html"><![CDATA[<h2 id="大学城一日游"><a href="#大学城一日游" class="headerlink" title="大学城一日游"></a>大学城一日游</h2><a id="more"></a>
+<p>　　今天同学来找我玩，想来长清这地儿也没什么好玩的，于是我俩就借了舍友一辆电动车来了，一路向西，来了一场跨越多个大学的<code>旅行</code>。</p>
+<p>　　看图 ☟</p>
+<div style="text-align:center"><img style="width:500px; height:400px;" src="http://odyridgzi.bkt.clouddn.com/image/blog/jy3.jpg"></div>
+
+
+<div style="text-align:center"><img style="width:500px; height:400px;" src="http://odyridgzi.bkt.clouddn.com/image/blog/jy0.jpg"></div>
+
+
+
+<div style="text-align:center"><img style="width:500px; height:400px;" src="http://odyridgzi.bkt.clouddn.com/image/blog/jy2.jpg"></div>
+
+
+
+<div style="text-align:center"><img style="width:500px; height:400px;" src="http://odyridgzi.bkt.clouddn.com/image/blog/jy4.jpg"></div>
+
+<div style="text-align:center"><img style="width:500px; height:400px;" src="http://odyridgzi.bkt.clouddn.com/image/blog/jy5.jpg"></div>
+
+<div style="text-align:center"><img style="width:500px; height:400px;" src="http://odyridgzi.bkt.clouddn.com/image/blog/jy7.jpg"></div>
+
+
+<p>　　进入大学这是第三个年头，还从来没进去过那么多个大学校园。今天完成了这个算是小小的任务了。<br>大学嘛，就该多闯闯，看看人家的大学校园，还是很不错的，以后还是多出去玩玩，珍惜大学时光。</p>
+]]></content>
+    </entry>
+    
+    <entry>
+      <title><![CDATA[我的第一篇博客]]></title>
+      <url>http://blog.trysth.top/2016/09/24/firstBlog/</url>
+      <content type="html"><![CDATA[<pre><code>闲来无事，在网上看到一个大神的博客，感觉不错，于是打算自己也弄一个试试。
+</code></pre><a id="more"></a>
+<p><img src="http://7xq2dv.com1.z0.glb.clouddn.com/33.gif"></p>
+]]></content>
+    </entry>
+    
+  
+  
+</search>

@@ -1,0 +1,18 @@
+
+#now_time,#together_time{
+    background-color:#d0e4fe;
+    font-family: Curive;
+    font-size: 40px;
+    stroke: black;
+    stroke-width: 2;
+    text-align: center;
+    text-shadow: 0 0 10px #fff,
+    0 0 20px #fff,
+    0 0 30px #fff,
+    0 0 40px #ff00de,
+    0 0 70px #ff00de,
+    0 0 80px #ff00de,
+    0 0 100px #ff00de,
+    0 0 150px #ff00de;
+}
+
