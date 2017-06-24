@@ -20,11 +20,11 @@ var time = function () {
 };
 var timing = function () {
     var setTime = function (d) {
-        d.setFullYear(2016);
-        d.setMonth(9-1);
-        d.setDate(29);
-        d.setHours(17);
-        d.setMinutes(12);
+        d.setFullYear(2018);
+        d.setMonth(8-1);
+        d.setDate(1);
+        d.setHours(0);
+        d.setMinutes(0);
         d.setSeconds(0);
         d.setMilliseconds(0);
         return d.getTime();
