@@ -20,9 +20,9 @@ var time = function () {
 };
 var timing = function () {
     var setTime = function (d) {
-        d.setFullYear(2018);
+        d.setFullYear(2017);
         d.setMonth(8-1);
-        d.setDate(1);
+        d.setDate(20);
         d.setHours(0);
         d.setMinutes(0);
         d.setSeconds(0);
